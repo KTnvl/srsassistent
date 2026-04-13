@@ -331,9 +331,17 @@ function renderAll(data) {
   document.getElementById('loading').classList.remove('visible');
   if (isUnlocked && activeCode && getUsage(activeCode) < MAX_USES) {
     document.getElementById('generateBtn').disabled = false;
-  } else if (!isUnlocked) {
+ } else if (!isUnlocked) {
+  const freeUsed = parseInt(localStorage.getItem('srs_free_usage') || '0') + 1;
+  localStorage.setItem('srs_free_usage', freeUsed);
+  if (freeUsed >= FREE_LIMIT) {
+    document.getElementById('generateBtn').disabled = true;
+    document.getElementById('accessStatus').textContent = 'Free limit reached (' + freeUsed + '/' + FREE_LIMIT + ') — enter an access code to continue.';
+    document.getElementById('accessStatus').className = 'access-status status-error';
+  } else {
     document.getElementById('generateBtn').disabled = false;
   }
+}
   const limit = isUnlocked ? 10 : 2;
 
   document.getElementById('cardsBadge').textContent = isUnlocked ? '10 cards' : '2 of 10 — free';
