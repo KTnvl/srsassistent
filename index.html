@@ -274,6 +274,15 @@ async function generate() {
   const topic = document.getElementById('topicInput').value.trim();
   if (!topic) { document.getElementById('topicInput').focus(); return; }
 
+  if (!isUnlocked) {
+  const freeUsed = parseInt(localStorage.getItem('srs_free_usage') || '0');
+  if (freeUsed >= FREE_LIMIT) {
+    document.getElementById('accessStatus').textContent = 'Free limit reached — enter an access code to continue.';
+    document.getElementById('accessStatus').className = 'access-status status-error';
+    document.getElementById('generateBtn').disabled = false;
+    return;
+  }
+}
   if (isUnlocked && activeCode) {
     const used = getUsage(activeCode);
     if (used >= MAX_USES) {
