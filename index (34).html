@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Revision System</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --ink: #2c2416;
+    --ink2: #6b6050;
+    --teal: #2a7c6f;
+    --teal-light: #e6f4f1;
+    --teal-mid: #3a9e8e;
+    --amber: #c47d2a;
+    --amber-light: #fdf3e3;
+    --muted: #9a8e80;
+    --border: rgba(44,36,22,0.1);
+    --border2: rgba(44,36,22,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+  .container { max-width: 800px; margin: 0 auto; padding: 48px 24px 80px; }
+  header { text-align: center; margin-bottom: 48px; }
+  .badge { display: inline-block; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); border: 1.5px solid var(--teal); padding: 5px 16px; border-radius: 20px; margin-bottom: 22px; background: var(--teal-light); font-weight: 600; }
+  h1 { font-family: 'Fraunces', serif; font-size: clamp(30px, 5vw, 46px); font-weight: 600; color: var(--ink); line-height: 1.15; margin-bottom: 14px; }
+  h1 em { font-style: italic; color: var(--teal); }
+  .subtitle { font-size: 16px; color: var(--ink2); font-weight: 300; max-width: 460px; margin: 0 auto; line-height: 1.7; }
+  .input-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; padding: 32px; margin-bottom: 24px; box-shadow: 0 2px 20px rgba(44,36,22,0.06); }
+  .input-label { font-size: 11px; color: var(--teal); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; display: block; font-weight: 600; }
+  .topic-input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 18px; font-size: 16px; font-family: 'Nunito', sans-serif; color: var(--ink); outline: none; transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 22px; }
+  .topic-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(42,124,111,0.1); }
+  .topic-input::placeholder { color: var(--muted); }
+  .access-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .code-input { flex: 1; background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 14px; font-family: 'Nunito', sans-serif; color: var(--ink); outline: none; transition: border-color 0.2s; letter-spacing: 0.08em; text-transform: uppercase; }
+  .code-input:focus { border-color: var(--teal); }
+  .code-input::placeholder { text-transform: none; letter-spacing: normal; color: var(--muted); }
+  .unlock-btn { background: var(--teal-light); border: 1.5px solid var(--teal); color: var(--teal); padding: 12px 20px; border-radius: 12px; font-size: 13px; font-family: 'Nunito', sans-serif; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+  .unlock-btn:hover { background: var(--teal); color: white; }
+  .access-status { font-size: 13px; margin-bottom: 18px; min-height: 18px; }
+  .status-free { color: var(--muted); }
+  .status-unlocked { color: var(--teal); font-weight: 600; }
+  .status-error { color: #c0392b; }
+  .usage-bar-wrap { margin-bottom: 18px; display: none; }
+  .usage-bar-wrap.visible { display: block; }
+  .usage-label { font-size: 12px; color: var(--ink2); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .usage-bar { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; }
+  .usage-fill { height: 100%; background: var(--teal); border-radius: 10px; transition: width 0.4s; }
+  .usage-fill.warning { background: var(--amber); }
+  .usage-fill.danger { background: #c0392b; }
+  .generate-btn { width: 100%; background: var(--teal); color: white; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-family: 'Nunito', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .generate-btn:hover { background: var(--teal-mid); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(42,124,111,0.25); }
+  .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .error-tip { font-size: 13px; color: #c0392b; margin-top: 12px; text-align: center; display: none; }
+  .error-tip.visible { display: block; }
+  .tabs { display: flex; gap: 6px; background: var(--surface); border-radius: 14px; padding: 6px; margin-bottom: 24px; border: 1.5px solid var(--border); box-shadow: 0 1px 8px rgba(44,36,22,0.04); }
+  .tab { flex: 1; padding: 10px 8px; border: none; border-radius: 10px; background: transparent; color: var(--muted); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--teal); color: white; }
+  .tab:hover:not(.active) { background: var(--teal-light); color: var(--teal); }
+  .results { display: none; }
+  .results.visible { display: block; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .cards-grid { display: grid; gap: 12px; }
+  .flashcard { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 6px rgba(44,36,22,0.04); }
+  .flashcard:hover { border-color: var(--teal); box-shadow: 0 3px 14px rgba(42,124,111,0.12); }
+  .card-front { padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .card-q { font-size: 15px; color: var(--ink); line-height: 1.5; }
+  .card-toggle { color: var(--teal); font-size: 22px; flex-shrink: 0; transition: transform 0.2s; line-height: 1; }
+  .card-answer { display: none; padding: 14px 22px 18px; border-top: 1.5px solid var(--border2); font-size: 14px; color: var(--ink2); line-height: 1.7; background: var(--teal-light); }
+  .flashcard.open .card-answer { display: block; }
+  .flashcard.open .card-toggle { transform: rotate(45deg); }
+  .quiz-item { margin-bottom: 24px; }
+  .quiz-num { font-size: 11px; color: var(--teal); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
+  .quiz-q { font-size: 15px; color: var(--ink); margin-bottom: 12px; line-height: 1.5; font-weight: 600; }
+  .options { display: grid; gap: 8px; }
+  .option { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 14px; color: var(--ink); cursor: pointer; transition: all 0.15s; text-align: left; font-family: 'Nunito', sans-serif; display: flex; gap: 10px; align-items: flex-start; }
+  .option:hover:not(:disabled) { border-color: var(--teal); background: var(--teal-light); }
+  .option.correct { border-color: var(--teal); background: var(--teal-light); color: var(--teal); font-weight: 600; }
+  .option.wrong { border-color: #e74c3c; background: #fdf0ef; color: #c0392b; }
+  .option:disabled { cursor: default; }
+  .opt-letter { color: var(--teal); font-weight: 700; flex-shrink: 0; }
+  .plan-grid { display: grid; gap: 10px; }
+  .plan-day { background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 18px 22px; box-shadow: 0 1px 6px rgba(44,36,22,0.04); }
+  .day-header { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .day-num { font-family: 'Fraunces', serif; font-size: 28px; color: var(--teal); line-height: 1; min-width: 32px; font-weight: 600; }
+  .day-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .day-weekday { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+  .day-tasks { font-size: 13px; color: var(--ink2); line-height: 1.6; margin-bottom: 10px; }
+  .day-tip { font-size: 12px; color: var(--teal); background: var(--teal-light); border-left: 3px solid var(--teal); padding: 8px 12px; border-radius: 0 8px 8px 0; line-height: 1.5; }
+  .locked-overlay { background: var(--surface2); border: 2px dashed var(--border); border-radius: 16px; padding: 24px; text-align: center; color: var(--muted); font-size: 14px; margin-top: 10px; }
+  .lock-icon { font-size: 24px; margin-bottom: 8px; }
+  .loading { text-align: center; padding: 48px; color: var(--muted); font-size: 15px; display: none; }
+  .loading.visible { display: block; }
+  .spinner { width: 32px; height: 32px; border: 2.5px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 14px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .sec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .sec-title { font-family: 'Fraunces', serif; font-size: 22px; color: var(--ink); font-weight: 600; }
+  .free-badge { font-size: 11px; background: var(--amber-light); color: var(--amber); border: 1.5px solid var(--amber); padding: 3px 12px; border-radius: 20px; font-weight: 600; }
+  .pro-badge { font-size: 11px; background: var(--teal-light); color: var(--teal); border: 1.5px solid var(--teal); padding: 3px 12px; border-radius: 20px; font-weight: 600; }
+  .score-row { margin-top: 18px; padding: 16px 20px; background: var(--teal-light); border: 1.5px solid var(--teal); border-radius: 12px; font-size: 14px; color: var(--teal); display: none; font-weight: 600; }
+  .score-row.visible { display: block; }
+  .score-num { font-weight: 700; }
+  .pdf-btn { width: 100%; background: white; color: var(--teal); border: 2px solid var(--teal); border-radius: 12px; padding: 14px; font-size: 15px; font-family: 'Nunito', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 24px; display: none; }
+  .pdf-btn:hover { background: var(--teal-light); }
+  .pdf-btn.visible { display: block; }
+  @media print {
+    body { background: white; }
+    .input-card, .tabs, .pdf-btn, .badge, .subtitle, header .badge { display: none !important; }
+    .container { padding: 0; max-width: 100%; }
+    header { margin-bottom: 16px; }
+    h1 { font-size: 28px; }
+    .results { display: block !important; }
+    .section { display: block !important; margin-bottom: 24px; }
+    .sec-header { margin-bottom: 12px; }
+    .flashcard { break-inside: avoid; border: 1px solid #ccc; margin-bottom: 8px; }
+    .card-answer { display: block !important; }
+    .card-toggle { display: none; }
+    .locked-overlay { display: none; }
+    .option { border: 1px solid #ccc; margin-bottom: 4px; }
+    .option.correct { border-color: #2a7c6f; background: #e6f4f1; }
+    .score-row { display: block !important; }
+    .plan-day { break-inside: avoid; border: 1px solid #ccc; margin-bottom: 8px; }
+    .free-badge, .pro-badge { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="badge">Study smarter, not longer</div>
+    <h1>Smart <em>Revision</em> System</h1>
+    <p class="subtitle">Enter any topic. Get flashcards, a quiz, and a 7-day plan — built on spaced repetition, retrieval practice, and error analysis.</p>
+  </header>
+
+  <div class="input-card">
+    <label class="input-label">Topic</label>
+    <input class="topic-input" type="text" id="topicInput" placeholder="e.g. The French Revolution, Photosynthesis, World War II…" />
+    <label class="input-label">Access code <span style="color:var(--muted);text-transform:none;letter-spacing:0;font-size:12px;font-weight:400;">(optional — unlock full content)</span></label>
+    <div class="access-row">
+      <input class="code-input" type="text" id="codeInput" placeholder="Enter your code" maxlength="20" />
+      <button class="unlock-btn" onclick="checkCode()">Unlock</button>
+    </div>
+    <div class="access-status status-free" id="accessStatus">Free preview: 2 flashcards + 2 quiz questions</div>
+    <div class="usage-bar-wrap" id="usageBarWrap">
+      <div class="usage-label">
+        <span id="usageText">Generations used</span>
+        <span id="usageCount"></span>
+      </div>
+      <div class="usage-bar"><div class="usage-fill" id="usageFill"></div></div>
+    </div>
+    <button class="generate-btn" id="generateBtn" onclick="generate()">Generate Study Materials</button>
+    <div class="error-tip" id="errorTip">Could not connect. Please try again.</div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    Building your personalised study materials…
+  </div>
+
+  <button class="pdf-btn" id="pdfBtn" onclick="downloadPDF()">⬇ Download as PDF</button>
+
+  <div class="results" id="results">
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('flashcards',this)">Flashcards</button>
+      <button class="tab" onclick="showTab('quiz',this)">Quiz</button>
+      <button class="tab" onclick="showTab('plan',this)">Study Plan</button>
+    </div>
+    <div class="section active" id="sec-flashcards">
+      <div class="sec-header"><span class="sec-title">Flashcards</span><span id="cardsBadge" class="free-badge">2 of 5 — free</span></div>
+      <div class="cards-grid" id="cardsGrid"></div>
+    </div>
+    <div class="section" id="sec-quiz">
+      <div class="sec-header"><span class="sec-title">Quiz</span><span id="quizBadge" class="free-badge">2 of 5 — free</span></div>
+      <div id="quizGrid"></div>
+      <div class="score-row" id="scoreRow">Your score: <span class="score-num" id="scoreNum"></span></div>
+    </div>
+    <div class="section" id="sec-plan">
+      <div class="sec-header"><span class="sec-title">7-Day Study Plan</span><span id="planBadge" class="pro-badge">Full access</span></div>
+      <div class="plan-grid" id="planGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const VALID_CODES = ['SMART2024','STUDY2024','REVISION25','KATRIN2025'];
+const MAX_USES = 20;
+let isUnlocked = false, quizAnswered = 0, quizCorrect = 0, currentData = null;
+let activeCode = null;
+
+const WEEKLY = [
+  {day:'Monday',   tip:'Spaced repetition works better than cramming. Review before you forget, not after.'},
+  {day:'Tuesday',  tip:'Don\'t reread — retrieve. Close your notes and write what you remember.'},
+  {day:'Wednesday',tip:'If you can answer it, you know it. Turn every key fact into a question.'},
+  {day:'Thursday', tip:'Mistakes show you what to study next. Analyse what went wrong and why.'},
+  {day:'Friday',   tip:'Focus on weak points only. Targeted review beats re-reading everything.'},
+  {day:'Saturday', tip:'Physical movement improves cognitive performance. Take a walk between sessions.'},
+  {day:'Sunday',   tip:'Sleep consolidates memory. Protect your sleep — it\'s part of studying.'}
+];
+
+function getUsage(code) {
+  return parseInt(localStorage.getItem('srs_usage_' + code) || '0');
+}
+function incrementUsage(code) {
+  const used = getUsage(code) + 1;
+  localStorage.setItem('srs_usage_' + code, used);
+  return used;
+}
+
+function updateUsageBar(code) {
+  const used = getUsage(code);
+  const remaining = MAX_USES - used;
+  const pct = Math.min((used / MAX_USES) * 100, 100);
+  document.getElementById('usageBarWrap').classList.add('visible');
+  document.getElementById('usageCount').textContent = used + ' / ' + MAX_USES;
+  document.getElementById('usageText').textContent = remaining > 0 ? remaining + ' generations remaining' : 'All generations used';
+  const fill = document.getElementById('usageFill');
+  fill.style.width = pct + '%';
+  fill.className = 'usage-fill' + (pct >= 90 ? ' danger' : pct >= 70 ? ' warning' : '');
+  if (remaining <= 0) {
+    document.getElementById('generateBtn').disabled = true;
+    document.getElementById('generateBtn').textContent = 'No generations remaining';
+  }
+}
+
+function checkCode() {
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  const status = document.getElementById('accessStatus');
+  if (VALID_CODES.includes(code)) {
+    const used = getUsage(code);
+    if (used >= MAX_USES) {
+      status.className = 'access-status status-error';
+      status.textContent = 'This code has reached its 20-use limit.';
+      return;
+    }
+    isUnlocked = true;
+    activeCode = code;
+    status.className = 'access-status status-unlocked';
+    status.textContent = '✓ Full access unlocked — ' + (MAX_USES - used) + ' generations remaining';
+    updateUsageBar(code);
+    if (currentData) renderAll(currentData);
+  } else if (code) {
+    status.className = 'access-status status-error';
+    status.textContent = '✗ Invalid code. Try SMART2024 as a demo.';
+  }
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+async function generate() {
+  const topic = document.getElementById('topicInput').value.trim();
+  if (!topic) { document.getElementById('topicInput').focus(); return; }
+
+  if (isUnlocked && activeCode) {
+    const used = getUsage(activeCode);
+    if (used >= MAX_USES) {
+      document.getElementById('accessStatus').textContent = 'No generations remaining on this code.';
+      document.getElementById('accessStatus').className = 'access-status status-error';
+      return;
+    }
+  }
+
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('loading').classList.add('visible');
+  document.getElementById('errorTip').classList.remove('visible');
+  quizAnswered = 0; quizCorrect = 0;
+  document.getElementById('scoreRow').classList.remove('visible');
+
+  try {
+    const resp = await fetch('/.netlify/functions/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ topic })
+    });
+    if (!resp.ok) throw new Error('status ' + resp.status);
+    currentData = await resp.json();
+
+    if (isUnlocked && activeCode) {
+      const used = incrementUsage(activeCode);
+      updateUsageBar(activeCode);
+      const remaining = MAX_USES - used;
+      const status = document.getElementById('accessStatus');
+      status.className = 'access-status status-unlocked';
+      status.textContent = '✓ Full access — ' + remaining + ' generation' + (remaining !== 1 ? 's' : '') + ' remaining';
+    }
+
+    renderAll(currentData);
+  } catch(e) {
+    document.getElementById('loading').classList.remove('visible');
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('errorTip').classList.add('visible');
+  }
+}
+
+function renderAll(data) {
+  document.getElementById('loading').classList.remove('visible');
+  if (isUnlocked && activeCode && getUsage(activeCode) < MAX_USES) {
+    document.getElementById('generateBtn').disabled = false;
+  } else if (!isUnlocked) {
+    document.getElementById('generateBtn').disabled = false;
+  }
+  const limit = isUnlocked ? 5 : 2;
+
+  document.getElementById('cardsBadge').textContent = isUnlocked ? '5 cards' : '2 of 5 — free';
+  document.getElementById('cardsBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
+  document.getElementById('quizBadge').textContent = isUnlocked ? '5 questions' : '2 of 5 — free';
+  document.getElementById('quizBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
+  document.getElementById('planBadge').textContent = isUnlocked ? 'Full access' : 'Code required';
+  document.getElementById('planBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
+
+  const cg = document.getElementById('cardsGrid');
+  cg.innerHTML = '';
+  data.flashcards.slice(0, limit).forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'flashcard';
+    d.innerHTML = '<div class="card-front"><span class="card-q">'+c.q+'</span><span class="card-toggle">+</span></div><div class="card-answer">'+c.a+'</div>';
+    d.onclick = () => d.classList.toggle('open');
+    cg.appendChild(d);
+  });
+  if (!isUnlocked) {
+    const l = document.createElement('div');
+    l.className = 'locked-overlay';
+    l.innerHTML = '<div class="lock-icon">🔒</div>3 more flashcards — enter an access code to unlock';
+    cg.appendChild(l);
+  }
+
+  const qg = document.getElementById('quizGrid');
+  qg.innerHTML = '';
+  quizAnswered = 0; quizCorrect = 0;
+  (isUnlocked ? data.quiz : data.quiz.slice(0,2)).forEach((q, qi) => {
+    const letters = ['A','B','C','D'];
+    const d = document.createElement('div');
+    d.className = 'quiz-item';
+    d.innerHTML = '<div class="quiz-num">Question '+(qi+1)+'</div><div class="quiz-q">'+q.q+'</div><div class="options">'+q.options.map((o,oi)=>'<button class="option" data-correct="'+(oi===q.correct)+'" onclick="answerQuiz(this)"><span class="opt-letter">'+letters[oi]+'</span>'+o.replace(/^[A-D]\)\s*/,'')+'</button>').join('')+'</div>';
+    qg.appendChild(d);
+  });
+  if (!isUnlocked) {
+    const l = document.createElement('div');
+    l.className = 'locked-overlay';
+    l.innerHTML = '<div class="lock-icon">🔒</div>3 more questions — enter an access code to unlock';
+    qg.appendChild(l);
+  }
+
+  const pg = document.getElementById('planGrid');
+  pg.innerHTML = '';
+  if (isUnlocked) {
+    data.plan.forEach((d, i) => {
+      const w = WEEKLY[i];
+      const el = document.createElement('div');
+      el.className = 'plan-day';
+      el.innerHTML = '<div class="day-header"><div class="day-num">'+(i+1)+'</div><div><div class="day-title">'+d.title+'</div><div class="day-weekday">'+w.day+'</div></div></div><div class="day-tasks">'+d.tasks+'</div><div class="day-tip">💡 '+w.tip+'</div>';
+      pg.appendChild(el);
+    });
+  } else {
+    const l = document.createElement('div');
+    l.className = 'locked-overlay';
+    l.innerHTML = '<div class="lock-icon">🔒</div>Your 7-day plan is waiting — enter an access code above';
+    pg.appendChild(l);
+  }
+
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('pdfBtn').classList.add('visible');
+}
+
+function downloadPDF() {
+  const topic = document.getElementById('topicInput').value || 'Study Materials';
+  document.title = 'Smart Revision — ' + topic;
+  window.print();
+  document.title = 'Smart Revision System';
+}
+
+function answerQuiz(btn) {
+  const isCorrect = btn.dataset.correct === 'true';
+  const opts = btn.parentElement.querySelectorAll('.option');
+  opts.forEach(o => {
+    o.disabled = true;
+    if (o.dataset.correct === 'true') o.classList.add('correct');
+  });
+  if (!isCorrect) btn.classList.add('wrong');
+  if (isCorrect) quizCorrect++;
+  quizAnswered++;
+  const total = isUnlocked ? 5 : 2;
+  if (quizAnswered === total) {
+    document.getElementById('scoreNum').textContent = quizCorrect + ' / ' + total + ' correct';
+    document.getElementById('scoreRow').classList.add('visible');
+  }
+}
+</script>
+</body>
+</html>
