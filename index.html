@@ -308,8 +308,8 @@ function renderAll(data) {
   } else if (!isUnlocked) {
     document.getElementById('generateBtn').disabled = false;
   }
-  const limit = isUnlocked ? 5 : 2;
-
+  const limit = isUnlocked ? 10 : 2;
+  
   document.getElementById('cardsBadge').textContent = isUnlocked ? '5 cards' : '2 of 5 — free';
   document.getElementById('cardsBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
   document.getElementById('quizBadge').textContent = isUnlocked ? '5 questions' : '2 of 5 — free';
