@@ -68,7 +68,7 @@ The correct field is the 0-based index of the correct option. All content must b
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1500,
+        max_tokens: 2500,
         messages: [{ role: 'user', content: prompt }]
       })
     });
