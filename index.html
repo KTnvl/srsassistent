@@ -310,9 +310,9 @@ function renderAll(data) {
   }
   const limit = isUnlocked ? 10 : 2;
   
-  document.getElementById('cardsBadge').textContent = isUnlocked ? '5 cards' : '2 of 5 — free';
+  document.getElementById('cardsBadge').textContent = isUnlocked ? '5 cards' : '2 of 10 — free';
   document.getElementById('cardsBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
-  document.getElementById('quizBadge').textContent = isUnlocked ? '5 questions' : '2 of 5 — free';
+  document.getElementById('quizBadge').textContent = isUnlocked ? '5 questions' : '2 of 10 — free';
   document.getElementById('quizBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
   document.getElementById('planBadge').textContent = isUnlocked ? 'Full access' : 'Code required';
   document.getElementById('planBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
