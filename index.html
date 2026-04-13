@@ -256,6 +256,8 @@ function checkCode() {
     status.className = 'access-status status-unlocked';
     status.textContent = '✓ Full access unlocked — ' + (MAX_USES - used) + ' generations remaining';
     updateUsageBar(code);
+   document.getElementById('generateBtn').disabled = false;
+   document.getElementById('generateBtn').textContent = 'Generate Study Materials';
     if (currentData) renderAll(currentData);
   } else if (code) {
     status.className = 'access-status status-error';
