@@ -104,12 +104,16 @@
   .score-row { margin-top: 18px; padding: 16px 20px; background: var(--teal-light); border: 1.5px solid var(--teal); border-radius: 12px; font-size: 14px; color: var(--teal); display: none; font-weight: 600; }
   .score-row.visible { display: block; }
   .score-num { font-weight: 700; }
-  .pdf-btn { width: 100%; background: white; color: var(--teal); border: 2px solid var(--teal); border-radius: 12px; padding: 14px; font-size: 15px; font-family: 'Nunito', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 24px; display: none; }
+  .philosophy-box { margin-top: 24px; background: var(--surface2); border-left: 4px solid var(--teal); border-radius: 0 12px 12px 0; padding: 18px 22px; font-size: 13px; color: var(--ink2); line-height: 1.8; display: none; }
+  .philosophy-box.visible { display: block; }
+  .philosophy-box strong.title { color: var(--teal); display: block; margin-bottom: 10px; font-size: 14px; }
+  .philosophy-box .tip-row { margin-top: 6px; }
+  .pdf-btn { width: 100%; background: white; color: var(--teal); border: 2px solid var(--teal); border-radius: 12px; padding: 14px; font-size: 15px; font-family: 'Nunito', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 16px; display: none; }
   .pdf-btn:hover { background: var(--teal-light); }
   .pdf-btn.visible { display: block; }
   @media print {
     body { background: white; }
-    .input-card, .tabs, .pdf-btn, .badge, .subtitle, header .badge { display: none !important; }
+    .input-card, .tabs, .pdf-btn, .philosophy-box, .badge, .subtitle, header .badge { display: none !important; }
     .container { padding: 0; max-width: 100%; }
     header { margin-bottom: 16px; }
     h1 { font-size: 28px; }
@@ -161,8 +165,6 @@
     Building your personalised study materials…
   </div>
 
-  <button class="pdf-btn" id="pdfBtn" onclick="downloadPDF()">⬇ Download as PDF</button>
-
   <div class="results" id="results">
     <div class="tabs">
       <button class="tab active" onclick="showTab('flashcards',this)">Flashcards</button>
@@ -183,6 +185,17 @@
       <div class="plan-grid" id="planGrid"></div>
     </div>
   </div>
+
+  <div class="philosophy-box" id="philosophyBox">
+    <strong class="title">💡 A note on using AI wisely</strong>
+    AI is your study partner, not your shortcut. These materials are a starting point — always verify what's generated, think critically, and make the content your own.<br>
+    <span class="tip-row">✍️ <strong>Write by hand</strong> — it strengthens memory retention</span><br>
+    <span class="tip-row">🔍 <strong>Verify &amp; question</strong> — critical thinking is the real skill</span><br>
+    <span class="tip-row">💡 <strong>Adapt &amp; personalise</strong> — use this as inspiration, not the final word</span>
+  </div>
+
+  <button class="pdf-btn" id="pdfBtn" onclick="downloadPDF()">⬇ Download as PDF</button>
+
 </div>
 
 <script>
@@ -271,6 +284,7 @@ async function generate() {
   document.getElementById('generateBtn').disabled = true;
   document.getElementById('results').classList.remove('visible');
   document.getElementById('pdfBtn').classList.remove('visible');
+  document.getElementById('philosophyBox').classList.remove('visible');
   document.getElementById('loading').classList.add('visible');
   document.getElementById('errorTip').classList.remove('visible');
   quizAnswered = 0; quizCorrect = 0;
@@ -369,6 +383,7 @@ function renderAll(data) {
   }
 
   document.getElementById('results').classList.add('visible');
+  document.getElementById('philosophyBox').classList.add('visible');
   document.getElementById('pdfBtn').classList.add('visible');
 }
 
