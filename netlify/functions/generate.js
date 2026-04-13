@@ -37,6 +37,10 @@ Return ONLY valid JSON, no markdown:
     {"q":"...","a":"..."},
     {"q":"...","a":"..."},
     {"q":"...","a":"..."},
+    {"q":"...","a":"..."},
+    {"q":"...","a":"..."},
+    {"q":"...","a":"..."},
+    {"q":"...","a":"..."},
     {"q":"...","a":"..."}
   ],
   "quiz": [
@@ -44,7 +48,12 @@ Return ONLY valid JSON, no markdown:
     {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":2},
     {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":1},
     {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":3},
-    {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0}
+    {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0},
+    {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":2},
+    {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":1},
+    {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":3},
+    {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0},
+    {"q":"question","options":["A) ...","B) ...","C) ...","D) ..."],"correct":2}
   ],
   "plan": [
     {"title":"Introduction & First Study","tasks":"specific task for day 1 about ${topic}"},
@@ -68,7 +77,7 @@ The correct field is the 0-based index of the correct option. All content must b
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 2500,
+        max_tokens: 4000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
