@@ -144,7 +144,7 @@
       <input class="code-input" type="text" id="codeInput" placeholder="Enter your code" maxlength="20" />
       <button class="unlock-btn" onclick="checkCode()">Unlock</button>
     </div>
-    <div class="access-status status-free" id="accessStatus">Free preview: 2 flashcards + 2 quiz questions</div>
+    <div class="access-status status-free" id="accessStatus">Free preview: 2 flashcards + 2 quiz questions + 1 day plan</div>
     <div class="usage-bar-wrap" id="usageBarWrap">
       <div class="usage-label">
         <span id="usageText">Generations used</span>
@@ -179,7 +179,7 @@
       <div class="score-row" id="scoreRow">Your score: <span class="score-num" id="scoreNum"></span></div>
     </div>
     <div class="section" id="sec-plan">
-      <div class="sec-header"><span class="sec-title">7-Day Study Plan</span><span id="planBadge" class="pro-badge">Full access</span></div>
+      <div class="sec-header"><span class="sec-title">7-Day Study Plan</span><span id="planBadge" class="free-badge">1 day free</span></div>
       <div class="plan-grid" id="planGrid"></div>
     </div>
   </div>
@@ -270,6 +270,7 @@ async function generate() {
 
   document.getElementById('generateBtn').disabled = true;
   document.getElementById('results').classList.remove('visible');
+  document.getElementById('pdfBtn').classList.remove('visible');
   document.getElementById('loading').classList.add('visible');
   document.getElementById('errorTip').classList.remove('visible');
   quizAnswered = 0; quizCorrect = 0;
@@ -309,12 +310,12 @@ function renderAll(data) {
     document.getElementById('generateBtn').disabled = false;
   }
   const limit = isUnlocked ? 10 : 2;
-  
-  document.getElementById('cardsBadge').textContent = isUnlocked ? '5 cards' : '2 of 10 — free';
+
+  document.getElementById('cardsBadge').textContent = isUnlocked ? '10 cards' : '2 of 10 — free';
   document.getElementById('cardsBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
-  document.getElementById('quizBadge').textContent = isUnlocked ? '5 questions' : '2 of 10 — free';
+  document.getElementById('quizBadge').textContent = isUnlocked ? '10 questions' : '2 of 10 — free';
   document.getElementById('quizBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
-  document.getElementById('planBadge').textContent = isUnlocked ? 'Full access' : 'Code required';
+  document.getElementById('planBadge').textContent = isUnlocked ? 'Full access' : '1 day free';
   document.getElementById('planBadge').className = isUnlocked ? 'pro-badge' : 'free-badge';
 
   const cg = document.getElementById('cardsGrid');
@@ -329,7 +330,7 @@ function renderAll(data) {
   if (!isUnlocked) {
     const l = document.createElement('div');
     l.className = 'locked-overlay';
-    l.innerHTML = '<div class="lock-icon">🔒</div>3 more flashcards — enter an access code to unlock';
+    l.innerHTML = '<div class="lock-icon">🔒</div>8 more flashcards — enter an access code to unlock';
     cg.appendChild(l);
   }
 
@@ -346,24 +347,24 @@ function renderAll(data) {
   if (!isUnlocked) {
     const l = document.createElement('div');
     l.className = 'locked-overlay';
-    l.innerHTML = '<div class="lock-icon">🔒</div>3 more questions — enter an access code to unlock';
+    l.innerHTML = '<div class="lock-icon">🔒</div>8 more questions — enter an access code to unlock';
     qg.appendChild(l);
   }
 
   const pg = document.getElementById('planGrid');
   pg.innerHTML = '';
-  if (isUnlocked) {
-    data.plan.forEach((d, i) => {
-      const w = WEEKLY[i];
-      const el = document.createElement('div');
-      el.className = 'plan-day';
-      el.innerHTML = '<div class="day-header"><div class="day-num">'+(i+1)+'</div><div><div class="day-title">'+d.title+'</div><div class="day-weekday">'+w.day+'</div></div></div><div class="day-tasks">'+d.tasks+'</div><div class="day-tip">💡 '+w.tip+'</div>';
-      pg.appendChild(el);
-    });
-  } else {
+  const planDays = isUnlocked ? data.plan : data.plan.slice(0, 1);
+  planDays.forEach((d, i) => {
+    const w = WEEKLY[i];
+    const el = document.createElement('div');
+    el.className = 'plan-day';
+    el.innerHTML = '<div class="day-header"><div class="day-num">'+(i+1)+'</div><div><div class="day-title">'+d.title+'</div><div class="day-weekday">'+w.day+'</div></div></div><div class="day-tasks">'+d.tasks+'</div><div class="day-tip">💡 '+w.tip+'</div>';
+    pg.appendChild(el);
+  });
+  if (!isUnlocked) {
     const l = document.createElement('div');
     l.className = 'locked-overlay';
-    l.innerHTML = '<div class="lock-icon">🔒</div>Your 7-day plan is waiting — enter an access code above';
+    l.innerHTML = '<div class="lock-icon">🔒</div>6 more days — enter an access code to unlock';
     pg.appendChild(l);
   }
 
@@ -388,7 +389,7 @@ function answerQuiz(btn) {
   if (!isCorrect) btn.classList.add('wrong');
   if (isCorrect) quizCorrect++;
   quizAnswered++;
-  const total = isUnlocked ? 5 : 2;
+  const total = isUnlocked ? 10 : 2;
   if (quizAnswered === total) {
     document.getElementById('scoreNum').textContent = quizCorrect + ' / ' + total + ' correct';
     document.getElementById('scoreRow').classList.add('visible');
